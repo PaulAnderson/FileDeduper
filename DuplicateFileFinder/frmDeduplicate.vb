@@ -16,7 +16,7 @@
 '  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-Public Class Form1
+Public Class frmDeduplicate
     Private StartPath As String
     Private FileLengths As New Dictionary(Of String, List(Of String))
     Private Sub Form1_Load(sender As Object, e As System.EventArgs) Handles Me.Load
@@ -32,9 +32,9 @@ Public Class Form1
     Private Sub FindDuplicatesButton_Click(sender As System.Object, e As System.EventArgs) Handles FindDuplicatesButton.Click
         FileLengths = New Dictionary(Of String, List(Of String))
         'clear treeview
-        If TreeView1.Nodes.Count > 0 Then
-            For i = TreeView1.Nodes.Count - 1 To 0 Step -1
-                TreeView1.Nodes.RemoveAt(i)
+        If tvResults.Nodes.Count > 0 Then
+            For i = tvResults.Nodes.Count - 1 To 0 Step -1
+                tvResults.Nodes.RemoveAt(i)
             Next
         End If
 
@@ -52,6 +52,9 @@ Public Class Form1
     Private Sub FindDuplicates(Path As String)
         FindDuplicates(New IO.DirectoryInfo(Path))
 
+        CurrentPathLabel.Text = "Updating List"
+        Application.DoEvents()
+
         'Remove file sizes with only 1 file
         Dim FileLengths2 As New Dictionary(Of String, List(Of String))
         For i = 0 To FileLengths.Keys.Count - 1
@@ -68,11 +71,12 @@ Public Class Form1
 
         'Add lengths and filenames to treeview
         For i As Integer = lengthList.Count - 1 To 0 Step -1
-            Dim newNode As TreeNode = TreeView1.Nodes.Add(lengthList(i).ToString, lengthList(i).ToString)
+            Dim newNode As TreeNode = tvResults.Nodes.Add(lengthList(i).ToString, lengthList(i).ToString)
+            newNode.Tag = Constants.NodeType.FileSize
         Next
-        For Each node As TreeNode In TreeView1.Nodes
+        For Each node As TreeNode In tvResults.Nodes
             For Each filename As String In FileLengths(node.Text)
-                node.Nodes.Add(filename)
+                node.Nodes.Add(filename).Tag = Constants.NodeType.File
             Next
             If Integer.Parse(node.Text) > 10485760 Then node.Expand() 'expand if >10 mb
         Next
@@ -106,5 +110,18 @@ Public Class Form1
             FindDuplicates(subDirInfo)
         Next
 
+    End Sub
+
+    Private Sub tvResults_NodeMouseClick(sender As System.Object, e As System.Windows.Forms.TreeNodeMouseClickEventArgs) Handles tvResults.NodeMouseClick
+        OpenNode(e.Node)
+    End Sub
+
+    Private Sub OpenFolderButton_Click(sender As System.Object, e As System.EventArgs) Handles OpenFolderButton.Click
+        OpenNode(tvResults.SelectedNode)
+    End Sub
+    Private Sub OpenNode(node As TreeNode)
+        If node.Tag IsNot Nothing AndAlso node.Tag = Constants.NodeType.File Then
+            Process.Start("explorer.exe", "/select,""" + node.Text + """")
+        End If
     End Sub
 End Class
