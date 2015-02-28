@@ -33,6 +33,7 @@ Partial Class frmDeduplicate
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.tvResults = New System.Windows.Forms.TreeView()
+        Me.cbLimit = New System.Windows.Forms.CheckBox()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.Panel3.SuspendLayout()
@@ -66,6 +67,7 @@ Partial Class frmDeduplicate
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.cbLimit)
         Me.Panel1.Controls.Add(Me.DrivesComboBox)
         Me.Panel1.Controls.Add(Me.FindDuplicatesButton)
         Me.Panel1.Controls.Add(Me.Label1)
@@ -137,6 +139,18 @@ Partial Class frmDeduplicate
         Me.tvResults.Size = New System.Drawing.Size(912, 498)
         Me.tvResults.TabIndex = 0
         '
+        'cbLimit
+        '
+        Me.cbLimit.AutoSize = True
+        Me.cbLimit.Checked = True
+        Me.cbLimit.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.cbLimit.Location = New System.Drawing.Point(265, 7)
+        Me.cbLimit.Name = "cbLimit"
+        Me.cbLimit.Size = New System.Drawing.Size(232, 17)
+        Me.cbLimit.TabIndex = 3
+        Me.cbLimit.Text = "Limit Display to 100 Largest results (quicker)"
+        Me.cbLimit.UseVisualStyleBackColor = True
+        '
         'frmDeduplicate
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -166,5 +180,6 @@ Partial Class frmDeduplicate
     Friend WithEvents Panel3 As System.Windows.Forms.Panel
     Friend WithEvents CurrentPathLabel As System.Windows.Forms.Label
     Friend WithEvents tvResults As System.Windows.Forms.TreeView
+    Friend WithEvents cbLimit As System.Windows.Forms.CheckBox
 
 End Class

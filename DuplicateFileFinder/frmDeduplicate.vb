@@ -55,6 +55,8 @@ Public Class frmDeduplicate
         CurrentPathLabel.Text = "Updating List"
         Application.DoEvents()
 
+        tvResults.Visible = False
+
         'Remove file sizes with only 1 file
         Dim FileLengths2 As New Dictionary(Of String, List(Of String))
         For i = 0 To FileLengths.Keys.Count - 1
@@ -70,18 +72,49 @@ Public Class frmDeduplicate
         lengthList.Sort()
 
         'Add lengths and filenames to treeview
-        For i As Integer = lengthList.Count - 1 To 0 Step -1
-            Dim newNode As TreeNode = tvResults.Nodes.Add(lengthList(i).ToString, lengthList(i).ToString)
+        Dim newNodeName As String
+        Dim endLoopCount As Integer = 0
+        If cbLimit.Checked Then endLoopCount = lengthList.Count - 101
+        For i As Integer = lengthList.Count - 1 To endLoopCount Step -1
+            newNodeName = lengthList(i).ToString
+            Dim newNode As TreeNode = tvResults.Nodes.Add(newNodeName, newNodeName)
             newNode.Tag = Constants.NodeType.FileSize
         Next
+
         For Each node As TreeNode In tvResults.Nodes
-            For Each filename As String In FileLengths(node.Text)
+            For Each filename As String In FileLengths(node.Name)
                 node.Nodes.Add(filename).Tag = Constants.NodeType.File
             Next
-            If Integer.Parse(node.Text) > 10485760 Then node.Expand() 'expand if >10 mb
+            node.Text = getHumanReadableFileSize(node.Text, node.Nodes.Count)
+            'If Integer.Parse(node.Text) > 10485760 Then node.Expand() 'expand if >10 mb
         Next
-    End Sub
 
+        tvResults.Visible = True
+
+    End Sub
+    Dim units() As String = New String() {"Bytes", "KB", "MB", "GB", "TB"}
+    Private Function getHumanReadableFileSize(fileSize As Integer, filesCount As Integer) As String
+
+        Const maxNumber As Integer = 1024
+        Dim unitNo As Integer = 0
+
+        While fileSize > maxNumber And unitNo < units.Count - 1
+            fileSize = fileSize / maxNumber
+            unitNo += 1
+        End While
+
+        Dim sb As New System.Text.StringBuilder
+        sb.Append(fileSize)
+        sb.Append(" ")
+        sb.Append(units(unitNo))
+        sb.Append(" - ")
+        sb.Append(filesCount)
+        sb.Append(" files")
+
+        Return sb.ToString()
+
+    End Function
+    Dim rand As New Random
     Private Sub FindDuplicates(dirInfo As IO.DirectoryInfo)
         CurrentPathLabel.Text = dirInfo.FullName
 
@@ -105,7 +138,7 @@ Public Class frmDeduplicate
         'Get subDirectories and recursively find duplicates
         Dim dirsInfo As IO.DirectoryInfo()
         dirsInfo = dirInfo.GetDirectories
-        Application.DoEvents()
+        If rand.Next(10) = 1 Then Application.DoEvents()
         For Each subDirInfo In dirsInfo
             FindDuplicates(subDirInfo)
         Next
