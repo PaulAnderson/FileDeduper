@@ -126,12 +126,19 @@ Public Class frmDeduplicate
             Exit Sub
         End Try
         For Each file As IO.FileInfo In fileInfo
+            Dim fileName As String
+            Try
+                fileName = file.FullName
+            Catch ex As System.IO.PathTooLongException
+                fileName = file.Directory.FullName(+"\" + file.Name)
+            End Try
+
             If FileLengths.ContainsKey(file.Length) Then
                 'duplicate
-                FileLengths(file.Length).Add(file.FullName)
+                FileLengths(file.Length).Add(fileName)
             Else
                 'new file size
-                FileLengths.Add(file.Length, New List(Of String) From {file.FullName})
+                FileLengths.Add(file.Length, New List(Of String) From {fileName})
             End If
         Next
 
