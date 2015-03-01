@@ -65,7 +65,7 @@ Public Class frmDeduplicate
         FileLengths = FileLengths2
 
         'Sort lengths
-        Dim lengthList As New List(Of Integer)(FileLengths.Keys.Count)
+        Dim lengthList As New List(Of Long)(FileLengths.Keys.Count)
         For i = 0 To FileLengths.Keys.Count - 1
             lengthList.Add(FileLengths.Keys(i))
         Next
@@ -85,15 +85,16 @@ Public Class frmDeduplicate
             For Each filename As String In FileLengths(node.Name)
                 node.Nodes.Add(filename).Tag = Constants.NodeType.File
             Next
-            node.Text = getHumanReadableFileSize(node.Text, node.Nodes.Count)
+            ' node.Text = getHumanReadableFileSize(node.Text, node.Nodes.Count)
             'If Integer.Parse(node.Text) > 10485760 Then node.Expand() 'expand if >10 mb
         Next
 
         tvResults.Visible = True
 
+        CurrentPathLabel.Text = "Search Complete"
     End Sub
     Dim units() As String = New String() {"Bytes", "KB", "MB", "GB", "TB"}
-    Private Function getHumanReadableFileSize(fileSize As Integer, filesCount As Integer) As String
+    Private Function getHumanReadableFileSize(fileSize As Long, filesCount As Integer) As String
 
         Const maxNumber As Integer = 1024
         Dim unitNo As Integer = 0
@@ -121,7 +122,7 @@ Public Class frmDeduplicate
         'Get file sizes for current directory files
         Dim fileInfo As IO.FileInfo()
         Try
-            fileInfo = dirInfo.GetFiles
+            fileInfo = dirInfo.GetFiles()
         Catch ex As UnauthorizedAccessException
             Exit Sub
         End Try
@@ -129,16 +130,24 @@ Public Class frmDeduplicate
             Dim fileName As String
             Try
                 fileName = file.FullName
+
             Catch ex As System.IO.PathTooLongException
-                fileName = file.Directory.FullName(+"\" + file.Name)
+ 
+                Dim FullPathField As System.Reflection.FieldInfo = GetType(System.IO.DirectoryInfo).GetField("FullPath", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic)
+                Dim directoryName As String = ""
+                directoryName = FullPathField.GetValue(dirInfo)
+
+                fileName = directoryName + "\" + file.Name
             End Try
 
-            If FileLengths.ContainsKey(file.Length) Then
-                'duplicate
-                FileLengths(file.Length).Add(fileName)
-            Else
-                'new file size
-                FileLengths.Add(file.Length, New List(Of String) From {fileName})
+            If file IsNot Nothing AndAlso file.Length >= Constants.MinimumFileSize Then
+                If FileLengths.ContainsKey(file.Length) Then
+                    'duplicate
+                    FileLengths(file.Length).Add(fileName)
+                Else
+                    'new file size
+                    FileLengths.Add(file.Length, New List(Of String) From {fileName})
+                End If
             End If
         Next
 
