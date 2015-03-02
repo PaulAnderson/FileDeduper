@@ -17,7 +17,7 @@
 
 
 Public Class frmDeduplicate
-    Private StartPath As String
+
     Private FileLengths As New Dictionary(Of String, List(Of String))
     Private Sub Form1_Load(sender As Object, e As System.EventArgs) Handles Me.Load
         PopulateDrivesCombo()
@@ -52,7 +52,7 @@ Public Class frmDeduplicate
     Private Sub FindDuplicates(Path As String)
         FindDuplicates(New IO.DirectoryInfo(Path))
 
-        CurrentPathLabel.Text = "Updating List"
+        CurrentPathLabel.Text = "Populating Results..."
         Application.DoEvents()
 
         tvResults.Visible = False
@@ -85,13 +85,13 @@ Public Class frmDeduplicate
             For Each filename As String In FileLengths(node.Name)
                 node.Nodes.Add(filename).Tag = Constants.NodeType.File
             Next
-            ' node.Text = getHumanReadableFileSize(node.Text, node.Nodes.Count)
+            node.Text = getHumanReadableFileSize(node.Text, node.Nodes.Count)
             'If Integer.Parse(node.Text) > 10485760 Then node.Expand() 'expand if >10 mb
         Next
 
         tvResults.Visible = True
 
-        CurrentPathLabel.Text = "Search Complete"
+        CurrentPathLabel.Text = "Search Complete."
     End Sub
     Dim units() As String = New String() {"Bytes", "KB", "MB", "GB", "TB"}
     Private Function getHumanReadableFileSize(fileSize As Long, filesCount As Integer) As String
@@ -162,15 +162,43 @@ Public Class frmDeduplicate
     End Sub
 
     Private Sub tvResults_NodeMouseClick(sender As System.Object, e As System.Windows.Forms.TreeNodeMouseClickEventArgs) Handles tvResults.NodeMouseClick
-        OpenNode(e.Node)
+        OpenNode(e.Node, e.X, e.Y)
     End Sub
 
     Private Sub OpenFolderButton_Click(sender As System.Object, e As System.EventArgs) Handles OpenFolderButton.Click
         OpenNode(tvResults.SelectedNode)
     End Sub
-    Private Sub OpenNode(node As TreeNode)
-        If node.Tag IsNot Nothing AndAlso node.Tag = Constants.NodeType.File Then
-            Process.Start("explorer.exe", "/select,""" + node.Text + """")
+    Private Sub OpenNode(node As TreeNode, Optional x As Integer = 0, Optional y As Integer = 0)
+        If node IsNot Nothing AndAlso node.Tag IsNot Nothing Then
+            Select Case node.Tag
+                Case Constants.NodeType.File
+                    Process.Start("explorer.exe", "/select,""" + node.Text + """")
+                Case Constants.NodeType.FileSize
+                    If x > 20 Then
+                        'Open/Close node if clicked on node text. ignore leftmost area because the control will automatically expand if clicked there
+                        If node.IsExpanded Then
+                            node.Collapse()
+                        Else
+                            node.Expand()
+                        End If
+                    End If
+            End Select
+
         End If
+    End Sub
+
+    Private Sub btnExpandAll_Click(sender As System.Object, e As System.EventArgs) Handles btnExpandAll.Click
+        tvResults.Visible = False
+        Static expanded As Boolean = False
+        Select Case expanded
+            Case False
+                tvResults.ExpandAll()
+                btnExpandAll.Text = "Collapse All"
+            Case True
+                tvResults.CollapseAll()
+                btnExpandAll.Text = "Expand All"
+        End Select
+        expanded = Not expanded
+        tvResults.Visible = True
     End Sub
 End Class

@@ -26,14 +26,15 @@ Partial Class frmDeduplicate
         Me.DrivesComboBox = New System.Windows.Forms.ComboBox()
         Me.FindDuplicatesButton = New System.Windows.Forms.Button()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.cbLimit = New System.Windows.Forms.CheckBox()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.CurrentPathLabel = New System.Windows.Forms.Label()
+        Me.btnExpandAll = New System.Windows.Forms.Button()
         Me.OpenFolderButton = New System.Windows.Forms.Button()
         Me.CloseButton = New System.Windows.Forms.Button()
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.tvResults = New System.Windows.Forms.TreeView()
-        Me.cbLimit = New System.Windows.Forms.CheckBox()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.Panel3.SuspendLayout()
@@ -77,9 +78,22 @@ Partial Class frmDeduplicate
         Me.Panel1.Size = New System.Drawing.Size(912, 29)
         Me.Panel1.TabIndex = 3
         '
+        'cbLimit
+        '
+        Me.cbLimit.AutoSize = True
+        Me.cbLimit.Checked = True
+        Me.cbLimit.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.cbLimit.Location = New System.Drawing.Point(265, 7)
+        Me.cbLimit.Name = "cbLimit"
+        Me.cbLimit.Size = New System.Drawing.Size(232, 17)
+        Me.cbLimit.TabIndex = 3
+        Me.cbLimit.Text = "Limit Display to 100 Largest results (quicker)"
+        Me.cbLimit.UseVisualStyleBackColor = True
+        '
         'Panel2
         '
         Me.Panel2.Controls.Add(Me.CurrentPathLabel)
+        Me.Panel2.Controls.Add(Me.btnExpandAll)
         Me.Panel2.Controls.Add(Me.OpenFolderButton)
         Me.Panel2.Controls.Add(Me.CloseButton)
         Me.Panel2.Controls.Add(Me.ProgressBar1)
@@ -96,6 +110,15 @@ Partial Class frmDeduplicate
         Me.CurrentPathLabel.Name = "CurrentPathLabel"
         Me.CurrentPathLabel.Size = New System.Drawing.Size(0, 13)
         Me.CurrentPathLabel.TabIndex = 2
+        '
+        'btnExpandAll
+        '
+        Me.btnExpandAll.Location = New System.Drawing.Point(614, 3)
+        Me.btnExpandAll.Name = "btnExpandAll"
+        Me.btnExpandAll.Size = New System.Drawing.Size(104, 23)
+        Me.btnExpandAll.TabIndex = 1
+        Me.btnExpandAll.Text = "Expand All"
+        Me.btnExpandAll.UseVisualStyleBackColor = True
         '
         'OpenFolderButton
         '
@@ -139,18 +162,6 @@ Partial Class frmDeduplicate
         Me.tvResults.Size = New System.Drawing.Size(912, 498)
         Me.tvResults.TabIndex = 0
         '
-        'cbLimit
-        '
-        Me.cbLimit.AutoSize = True
-        Me.cbLimit.Checked = True
-        Me.cbLimit.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbLimit.Location = New System.Drawing.Point(265, 7)
-        Me.cbLimit.Name = "cbLimit"
-        Me.cbLimit.Size = New System.Drawing.Size(232, 17)
-        Me.cbLimit.TabIndex = 3
-        Me.cbLimit.Text = "Limit Display to 100 Largest results (quicker)"
-        Me.cbLimit.UseVisualStyleBackColor = True
-        '
         'frmDeduplicate
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -181,5 +192,6 @@ Partial Class frmDeduplicate
     Friend WithEvents CurrentPathLabel As System.Windows.Forms.Label
     Friend WithEvents tvResults As System.Windows.Forms.TreeView
     Friend WithEvents cbLimit As System.Windows.Forms.CheckBox
+    Friend WithEvents btnExpandAll As System.Windows.Forms.Button
 
 End Class
