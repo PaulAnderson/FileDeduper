@@ -228,6 +228,7 @@ Public Class frmDeduplicate
         If DrivesComboBox.SelectedItem.ToString = browseText Then
             'todo: select folder dialog
             MessageBox.Show("Browse...todo")
+
         End If
     End Sub
 End Class
