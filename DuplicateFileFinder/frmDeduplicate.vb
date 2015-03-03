@@ -19,13 +19,28 @@
 Public Class frmDeduplicate
 
     Private FileLengths As New Dictionary(Of String, List(Of String))
-    Private Sub Form1_Load(sender As Object, e As System.EventArgs) Handles Me.Load
+    Private Const browseText As String = "Browse..."
+    Private Sub frmDeduplicate_Load(sender As Object, e As System.EventArgs) Handles Me.Load
         PopulateDrivesCombo()
     End Sub
     Private Sub PopulateDrivesCombo()
-        For Each drive As String In IO.Directory.GetLogicalDrives()
-            DrivesComboBox.Items.Add(drive)
+        'For Each drive As String In IO.Directory.GetLogicalDrives()
+        '    DrivesComboBox.Items.Add(drive)
+        'Next
+        For Each drive As System.IO.DriveInfo In System.IO.DriveInfo.GetDrives()
+            If drive.IsReady AndAlso Not String.IsNullOrEmpty(drive.VolumeLabel) Then
+                Dim percentUsed As Double = (1 - (drive.AvailableFreeSpace / drive.TotalSize)) * 100
+                DrivesComboBox.Items.Add(drive.RootDirectory.Name + " [" + drive.VolumeLabel + "] " + getHumanReadableFileSize(drive.TotalSize) + ", " + percentUsed.ToString("n0") + "% Full")
+            Else
+                If drive.DriveType = IO.DriveType.CDRom Then
+                    DrivesComboBox.Items.Add(drive.RootDirectory.Name + " [Optical Drive, No Disc]")
+                Else
+                    DrivesComboBox.Items.Add(drive.RootDirectory.Name)
+                End If
+
+            End If
         Next
+        DrivesComboBox.Items.Add(browseText)
         If DrivesComboBox.Items.Count > 0 Then DrivesComboBox.SelectedIndex = 0
     End Sub
 
@@ -40,7 +55,8 @@ Public Class frmDeduplicate
 
         Dim path As String
         If DrivesComboBox.SelectedItem IsNot Nothing Then
-            path = DrivesComboBox.SelectedItem.ToString
+            If DrivesComboBox.SelectedItem.ToString = browseText Then Exit Sub
+            path = DrivesComboBox.SelectedItem.ToString.Substring(0, 3) 'Use only first 3 chars of combobox item. ie "C:\"
         ElseIf Not String.IsNullOrEmpty(DrivesComboBox.Text) Then
             path = DrivesComboBox.Text
         Else
@@ -50,6 +66,8 @@ Public Class frmDeduplicate
         FindDuplicates(path)
     End Sub
     Private Sub FindDuplicates(Path As String)
+        If String.IsNullOrEmpty(Path) Then Exit Sub
+
         FindDuplicates(New IO.DirectoryInfo(Path))
 
         CurrentPathLabel.Text = "Populating Results..."
@@ -94,7 +112,7 @@ Public Class frmDeduplicate
         CurrentPathLabel.Text = "Search Complete."
     End Sub
     Dim units() As String = New String() {"Bytes", "KB", "MB", "GB", "TB"}
-    Private Function getHumanReadableFileSize(fileSize As Long, filesCount As Integer) As String
+    Private Function getHumanReadableFileSize(fileSize As Long, Optional filesCount As Integer? = Nothing) As String
 
         Const maxNumber As Integer = 1024
         Dim unitNo As Integer = 0
@@ -108,10 +126,11 @@ Public Class frmDeduplicate
         sb.Append(fileSize)
         sb.Append(" ")
         sb.Append(units(unitNo))
-        sb.Append(" - ")
-        sb.Append(filesCount)
-        sb.Append(" files")
-
+        If filesCount.HasValue Then
+            sb.Append(" - ")
+            sb.Append(filesCount.Value)
+            sb.Append(" files")
+        End If
         Return sb.ToString()
 
     End Function
@@ -124,6 +143,9 @@ Public Class frmDeduplicate
         Try
             fileInfo = dirInfo.GetFiles()
         Catch ex As UnauthorizedAccessException
+            Exit Sub
+        Catch ex As IO.IOException
+            MessageBox.Show(ex.Message)
             Exit Sub
         End Try
         For Each file As IO.FileInfo In fileInfo
@@ -200,5 +222,12 @@ Public Class frmDeduplicate
         End Select
         expanded = Not expanded
         tvResults.Visible = True
+    End Sub
+
+    Private Sub DrivesComboBox_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles DrivesComboBox.SelectedIndexChanged
+        If DrivesComboBox.SelectedItem.ToString = browseText Then
+            'todo: select folder dialog
+            MessageBox.Show("Browse...todo")
+        End If
     End Sub
 End Class

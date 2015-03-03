@@ -51,17 +51,20 @@ Partial Class frmDeduplicate
         '
         'DrivesComboBox
         '
+        Me.DrivesComboBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DrivesComboBox.FormattingEnabled = True
         Me.DrivesComboBox.Location = New System.Drawing.Point(65, 3)
         Me.DrivesComboBox.Name = "DrivesComboBox"
-        Me.DrivesComboBox.Size = New System.Drawing.Size(94, 21)
+        Me.DrivesComboBox.Size = New System.Drawing.Size(466, 21)
         Me.DrivesComboBox.TabIndex = 1
         '
         'FindDuplicatesButton
         '
-        Me.FindDuplicatesButton.Location = New System.Drawing.Point(165, 3)
+        Me.FindDuplicatesButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.FindDuplicatesButton.Location = New System.Drawing.Point(537, 2)
         Me.FindDuplicatesButton.Name = "FindDuplicatesButton"
-        Me.FindDuplicatesButton.Size = New System.Drawing.Size(94, 23)
+        Me.FindDuplicatesButton.Size = New System.Drawing.Size(125, 23)
         Me.FindDuplicatesButton.TabIndex = 2
         Me.FindDuplicatesButton.Text = "Find Duplicates"
         Me.FindDuplicatesButton.UseVisualStyleBackColor = True
@@ -80,10 +83,11 @@ Partial Class frmDeduplicate
         '
         'cbLimit
         '
+        Me.cbLimit.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cbLimit.AutoSize = True
         Me.cbLimit.Checked = True
         Me.cbLimit.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbLimit.Location = New System.Drawing.Point(265, 7)
+        Me.cbLimit.Location = New System.Drawing.Point(668, 6)
         Me.cbLimit.Name = "cbLimit"
         Me.cbLimit.Size = New System.Drawing.Size(232, 17)
         Me.cbLimit.TabIndex = 3
