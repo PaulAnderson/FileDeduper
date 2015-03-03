@@ -20,6 +20,7 @@ Public Class frmDeduplicate
 
     Private FileLengths As New Dictionary(Of String, List(Of String))
     Private Const browseText As String = "Browse..."
+    Private drivesCount As Integer
     Private Sub frmDeduplicate_Load(sender As Object, e As System.EventArgs) Handles Me.Load
         PopulateDrivesCombo()
     End Sub
@@ -27,7 +28,10 @@ Public Class frmDeduplicate
         'For Each drive As String In IO.Directory.GetLogicalDrives()
         '    DrivesComboBox.Items.Add(drive)
         'Next
-        For Each drive As System.IO.DriveInfo In System.IO.DriveInfo.GetDrives()
+        Dim drives() As System.IO.DriveInfo
+        drives = System.IO.DriveInfo.GetDrives()
+        drivesCount = drives.Length
+        For Each drive As System.IO.DriveInfo In drives
             If drive.IsReady AndAlso Not String.IsNullOrEmpty(drive.VolumeLabel) Then
                 Dim percentUsed As Double = (1 - (drive.AvailableFreeSpace / drive.TotalSize)) * 100
                 DrivesComboBox.Items.Add(drive.RootDirectory.Name + " [" + drive.VolumeLabel + "] " + getHumanReadableFileSize(drive.TotalSize) + ", " + percentUsed.ToString("n0") + "% Full")
@@ -55,8 +59,16 @@ Public Class frmDeduplicate
 
         Dim path As String
         If DrivesComboBox.SelectedItem IsNot Nothing Then
-            If DrivesComboBox.SelectedItem.ToString = browseText Then Exit Sub
-            path = DrivesComboBox.SelectedItem.ToString.Substring(0, 3) 'Use only first 3 chars of combobox item. ie "C:\"
+            If DrivesComboBox.SelectedItem.ToString = browseText Then
+                MessageBox.Show("Enter a start path.")
+                Exit Sub
+            ElseIf DrivesComboBox.SelectedIndex < drivesCount Then
+                path = DrivesComboBox.SelectedItem.ToString.Substring(0, 3) 'Use only first 3 chars of combobox drive item. ie "C:\"
+            Else
+                path = DrivesComboBox.SelectedItem.ToString
+            End If
+
+
         ElseIf Not String.IsNullOrEmpty(DrivesComboBox.Text) Then
             path = DrivesComboBox.Text
         Else
@@ -67,6 +79,10 @@ Public Class frmDeduplicate
     End Sub
     Private Sub FindDuplicates(Path As String)
         If String.IsNullOrEmpty(Path) Then Exit Sub
+
+        ProgressBar1.Visible = True
+        lblNoResults.Visible = False
+        btnExpandAll.Text = "Expand All"
 
         FindDuplicates(New IO.DirectoryInfo(Path))
 
@@ -93,6 +109,7 @@ Public Class frmDeduplicate
         Dim newNodeName As String
         Dim endLoopCount As Integer = 0
         If cbLimit.Checked Then endLoopCount = lengthList.Count - 101
+        If endLoopCount < 0 Then endLoopCount = 0
         For i As Integer = lengthList.Count - 1 To endLoopCount Step -1
             newNodeName = lengthList(i).ToString
             Dim newNode As TreeNode = tvResults.Nodes.Add(newNodeName, newNodeName)
@@ -108,8 +125,14 @@ Public Class frmDeduplicate
         Next
 
         tvResults.Visible = True
+        ProgressBar1.Visible = False
+        If tvResults.Nodes.Count = 0 Then
+            lblNoResults.Visible = True
+            CurrentPathLabel.Text = "Search Complete. No duplicate files found."
+        Else
+            CurrentPathLabel.Text = "Search Complete."
+        End If
 
-        CurrentPathLabel.Text = "Search Complete."
     End Sub
     Dim units() As String = New String() {"Bytes", "KB", "MB", "GB", "TB"}
     Private Function getHumanReadableFileSize(fileSize As Long, Optional filesCount As Integer? = Nothing) As String
@@ -135,7 +158,7 @@ Public Class frmDeduplicate
 
     End Function
     Dim rand As New Random
-    Private Sub FindDuplicates(dirInfo As IO.DirectoryInfo)
+    Private Sub FindDuplicates(dirInfo As IO.DirectoryInfo, Optional treeDepth As Integer = 0)
         CurrentPathLabel.Text = dirInfo.FullName
 
         'Get file sizes for current directory files
@@ -154,7 +177,7 @@ Public Class frmDeduplicate
                 fileName = file.FullName
 
             Catch ex As System.IO.PathTooLongException
- 
+
                 Dim FullPathField As System.Reflection.FieldInfo = GetType(System.IO.DirectoryInfo).GetField("FullPath", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic)
                 Dim directoryName As String = ""
                 directoryName = FullPathField.GetValue(dirInfo)
@@ -176,9 +199,17 @@ Public Class frmDeduplicate
         'Get subDirectories and recursively find duplicates
         Dim dirsInfo As IO.DirectoryInfo()
         dirsInfo = dirInfo.GetDirectories
-        If rand.Next(10) = 1 Then Application.DoEvents()
+
+        If treeDepth = 0 Then
+            ProgressBar1.Minimum = 0
+            ProgressBar1.Maximum = dirInfo.GetDirectories.Count
+            ProgressBar1.Value = 0
+        End If
+
+        If treeDepth = 0 OrElse rand.Next(10) = 1 Then Application.DoEvents()
         For Each subDirInfo In dirsInfo
-            FindDuplicates(subDirInfo)
+            FindDuplicates(subDirInfo, treeDepth + 1)
+            If treeDepth = 0 Then ProgressBar1.Value += 1
         Next
 
     End Sub
@@ -223,12 +254,26 @@ Public Class frmDeduplicate
         expanded = Not expanded
         tvResults.Visible = True
     End Sub
-
+    Dim DrivesComboBox_SelectedIndexChangingProgrammatically As Boolean = False
     Private Sub DrivesComboBox_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles DrivesComboBox.SelectedIndexChanged
-        If DrivesComboBox.SelectedItem.ToString = browseText Then
-            'todo: select folder dialog
-            MessageBox.Show("Browse...todo")
+        If Not DrivesComboBox_SelectedIndexChangingProgrammatically Then
+            If DrivesComboBox.SelectedItem IsNot Nothing AndAlso DrivesComboBox.SelectedItem.ToString = browseText Then
+                'select folder dialog
 
+                Dim dlg As New System.Windows.Forms.FolderBrowserDialog()
+                If dlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                    Try
+                        DrivesComboBox_SelectedIndexChangingProgrammatically = True
+                        DrivesComboBox.Items.Add(dlg.SelectedPath)
+                        DrivesComboBox.SelectedIndex = DrivesComboBox.Items.Count - 1
+
+                    Finally
+                        DrivesComboBox_SelectedIndexChangingProgrammatically = False
+                    End Try
+                    
+                End If
+            End If
         End If
     End Sub
+     
 End Class
