@@ -1,4 +1,5 @@
 FileDeduper
 ===========
 
-Finds duplicate files based on filesize. Windows. vb.net
+FileDeduper scans and identifies duplicate files on disk.
+Build using VB.Net
