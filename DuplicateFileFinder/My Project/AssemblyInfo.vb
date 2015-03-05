@@ -11,7 +11,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTitle("DuplicateFileFinder")> 
 <Assembly: AssemblyDescription("Finds duplicate files based on file size")> 
 <Assembly: AssemblyCompany("Paul Anderson")> 
-<Assembly: AssemblyProduct("DuplicateFileFinder")> 
+<Assembly: AssemblyProduct("Duplicate File Finder")> 
 <Assembly: AssemblyCopyright("Copyright ©  2013 Paul Anderson")> 
 <Assembly: AssemblyTrademark("")> 
 

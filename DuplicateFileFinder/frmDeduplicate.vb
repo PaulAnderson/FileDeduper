@@ -168,7 +168,7 @@ Public Class frmDeduplicate
         Catch ex As UnauthorizedAccessException
             Exit Sub
         Catch ex As IO.IOException
-            MessageBox.Show(ex.Message)
+            MessageBox.Show(ex.ToString, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error)
             Exit Sub
         End Try
         For Each file As IO.FileInfo In fileInfo
