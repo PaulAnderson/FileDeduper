@@ -1,5 +1,5 @@
 ﻿' Paul's Duplicate file finder - finds duplicate files based on file size.
-' Copyright (C) 2013 Paul Anderson
+' Copyright (C) 2013-2015 Paul Anderson
 ' 
 '  This program is free software; you can redistribute it and/or
 '  modify it under the terms of the GNU General Public License
@@ -37,7 +37,7 @@ Public Class frmDeduplicate
                 DrivesComboBox.Items.Add(drive.RootDirectory.Name + " [" + drive.VolumeLabel + "] " + getHumanReadableFileSize(drive.TotalSize) + ", " + percentUsed.ToString("n0") + "% Full")
             Else
                 If drive.DriveType = IO.DriveType.CDRom Then
-                    DrivesComboBox.Items.Add(drive.RootDirectory.Name + " [Optical Drive, No Disc]")
+                    DrivesComboBox.Items.Add(String.Format("{0} {1}", drive.RootDirectory.Name, Constants.Optical_NoDisk))
                 Else
                     DrivesComboBox.Items.Add(drive.RootDirectory.Name)
                 End If
@@ -274,6 +274,8 @@ Public Class frmDeduplicate
                 End If
             End If
         End If
+
+        FindDuplicatesButton.Enabled = (Not DrivesComboBox.Text.EndsWith(Constants.Optical_NoDisk))
     End Sub
      
 End Class
