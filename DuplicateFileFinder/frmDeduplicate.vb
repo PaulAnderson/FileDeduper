@@ -261,7 +261,7 @@ Public Class frmDeduplicate
                 'select folder dialog
 
                 Dim dlg As New System.Windows.Forms.FolderBrowserDialog()
-                If dlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                If dlg.ShowDialog = DialogResult.OK Then
                     Try
                         DrivesComboBox_SelectedIndexChangingProgrammatically = True
                         DrivesComboBox.Items.Add(dlg.SelectedPath)
@@ -270,7 +270,7 @@ Public Class frmDeduplicate
                     Finally
                         DrivesComboBox_SelectedIndexChangingProgrammatically = False
                     End Try
-                    
+
                 End If
             End If
         End If

@@ -8,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("DuplicateFileFinder")> 
-<Assembly: AssemblyDescription("Finds duplicate files based on file size")> 
-<Assembly: AssemblyCompany("Paul Anderson")> 
-<Assembly: AssemblyProduct("Duplicate File Finder")> 
-<Assembly: AssemblyCopyright("Copyright ©  2013 Paul Anderson")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyTitle("WindowsApplication1")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("WindowsApplication1")>
+<Assembly: AssemblyCopyright("Copyright ©  2015")>
+<Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("d1fb212a-5251-4ac9-8b2d-526a68d98253")> 
+<Assembly: Guid("48df9b8e-a1aa-4ff8-ab49-4749bef33961")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.0.0.0")>
+<Assembly: AssemblyFileVersion("1.0.0.0")>
